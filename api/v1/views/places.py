@@ -7,6 +7,8 @@ from api.v1.views import app_views
 from models import storage
 from models.place import Place
 from models.city import City
+from models.state import State
+from models.amenity import Amenity
 
 
 @app_views.route('/cities/<string:city_id>/places', methods=['GET', 'POST'],
@@ -16,7 +18,6 @@ def places(city_id):
     RestFul API actions.
     """
     city = storage.get('City', city_id)
-    print(city)
     if city is None:
         abort(404)
     if request.method == 'GET':
@@ -60,3 +61,45 @@ def get_place_id(place_id):
                 setattr(place, key, value)
                 storage.save()
         return jsonify(place.to_dict()), 200
+
+
+@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
+def places_search():
+    """Searches for Place objects based on the provided JSON in the request body."""
+    try:
+        request_data = request.get_json()
+        if not request_data:
+            return jsonify({'error': 'Not a JSON'}), 400
+
+        # Extract the optional keys: states, cities, and amenities from the request data
+        states = request_data.get('states', [])
+        cities = request_data.get('cities', [])
+        amenities = request_data.get('amenities', [])
+
+        # Retrieve all Place objects if all lists are empty
+        if not (states or cities or amenities):
+            return jsonify([place.to_dict() for place in storage.all(Place).values()])
+
+        # Fetch all relevant states and cities
+        state_objs = [storage.get(State, state_id) for state_id in states]
+        city_objs = [storage.get(City, city_id) for city_id in cities]
+
+        # Gather Place objects based on the provided search criteria
+        places_result = set()
+        for state_obj in state_objs:
+            if state_obj:
+                for city in state_obj.cities:
+                    places_result.update(city.places)
+        for city_obj in city_objs:
+            if city_obj:
+                places_result.update(city_obj.places)
+
+        # Filter by amenities if provided
+        if amenities:
+            amenities_set = set(amenities)
+            places_result = [place for place in places_result if amenities_set.issubset(place.amenity_ids)]
+
+        return jsonify([place.to_dict() for place in places_result])
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
