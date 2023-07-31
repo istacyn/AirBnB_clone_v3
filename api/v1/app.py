@@ -6,6 +6,8 @@ app.py file
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
+import os
+
 
 """Create a Flask app"""
 app = Flask(__name__)
