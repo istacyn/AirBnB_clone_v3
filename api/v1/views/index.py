@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Sep  1 14:42:23 2020
-@authors: Robinson Montes.
-          Mauricio Olarte
+api index
 """
 from flask import jsonify, Blueprint
 from models import storage
