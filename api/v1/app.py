@@ -7,10 +7,13 @@ from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
 import os
-
+from flask_cors import CORS
 
 """Create a Flask app"""
 app = Flask(__name__)
+
+# Set up CORS
+CORS(app, resources={r"/api/*": {"origins": "0.0.0.0"}})
 
 """Register the blueprint app_views to the Flask instance app"""
 app.register_blueprint(app_views)
