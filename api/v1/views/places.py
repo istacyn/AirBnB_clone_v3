@@ -65,20 +65,24 @@ def get_place_id(place_id):
 
 @app_views.route('/places_search', methods=['POST'], strict_slashes=False)
 def places_search():
-    """Searches for Place objects based on the provided JSON in the request body."""
+    """Searches for Place objects based on the
+    provided JSON in the request body.
+    """
     try:
         request_data = request.get_json()
         if not request_data:
             return jsonify({'error': 'Not a JSON'}), 400
 
-        # Extract the optional keys: states, cities, and amenities from the request data
+        # Extract the optional keys: states, cities, and
+        # amenities from the request data
         states = request_data.get('states', [])
         cities = request_data.get('cities', [])
         amenities = request_data.get('amenities', [])
 
         # Retrieve all Place objects if all lists are empty
         if not (states or cities or amenities):
-            return jsonify([place.to_dict() for place in storage.all(Place).values()])
+            return jsonify([place.to_dict() for place in
+                            storage.all(Place).values()])
 
         # Fetch all relevant states and cities
         state_objs = [storage.get(State, state_id) for state_id in states]
@@ -97,7 +101,8 @@ def places_search():
         # Filter by amenities if provided
         if amenities:
             amenities_set = set(amenities)
-            places_result = [place for place in places_result if amenities_set.issubset(place.amenity_ids)]
+            places_result = [place for place in places_result if
+                             amenities_set.issubset(place.amenity_ids)]
 
         return jsonify([place.to_dict() for place in places_result])
 
