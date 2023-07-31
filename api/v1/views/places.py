@@ -128,7 +128,7 @@ def filter_places_by_amenities(place_list, city, amenities=None):
             place_dict = place.to_dict()
             if place_dict.get("amenities"):
                 place_dict.pop("amenities")
-            if place.to_dict not in place_list:
+            if place.to_dict() not in place_list:
                 place_list.append(place_dict)
 
 
