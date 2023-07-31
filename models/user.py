@@ -32,14 +32,16 @@ class User(BaseModel, Base):
 
         # Hash the password if it exists in the arguments
         if "password" in kwargs:
-            self.password = hashlib.md5(kwargs["password"].encode()).hexdigest()
+            self.password = hashlib.md5(kwargs["password"]
+                                        .encode()).hexdigest()
 
     def to_dict(self, **kwargs):
         """Returns a dictionary representation of the User instance"""
         # Create a shallow copy of the instance's dictionary
         user_dict = super().to_dict(**kwargs)
 
-        # If the storage type is not 'file', remove the 'password' key from the dictionary
+        # If the storage type is not 'file', remove the 'password'
+        # key from the dictionary
         if models.storage_t != 'file':
             user_dict.pop('password', None)
 
