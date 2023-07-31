@@ -18,7 +18,7 @@ def places(city_id):
     """Create a new view for City objects that handles all default
     RestFul API actions.
     """
-    city = storage.get('City', city_id)
+    city = storage.get(City, city_id)
     if city is None:
         abort(404)
     if request.method == 'GET':
@@ -26,7 +26,7 @@ def places(city_id):
 
     if request.method == 'POST':
         post = get_json(request)
-        if post is None or type(post) != dict:
+        if not post:
             return make_respone('Not a JSON\n', 400)
         if 'name' not in post.keys():
             return make_response('Missing name\n', 400)
@@ -74,7 +74,7 @@ def places_search():
     provided JSON in the request body.
     """
     request_data = get_json(request)
-    if not request_data:
+    if request_data is None:
         return make_response('Not a JSON\n', 400)
 
     places = []
