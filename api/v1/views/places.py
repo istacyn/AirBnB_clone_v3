@@ -2,7 +2,7 @@
 """
 places api
 """
-from flask import Blueprint, jsonify, request, abort, make_response
+from flask import jsonify, request, abort, make_response
 from api.v1.views import app_views
 from models import storage
 from models.place import Place
@@ -28,7 +28,7 @@ def places(city_id):
         post = get_json(request)
         if post is None or type(post) != dict:
             return make_respone('Not a JSON\n', 400)
-        if 'name' is not in post.keys():
+        if 'name' not in post.keys():
             return make_response('Missing name\n', 400)
         if 'user_id' not in post.keys():
             return make_response('Missing user_id\n', 400)
@@ -77,7 +77,7 @@ def places_search():
     if not request_data:
         return make_response('Not a JSON\n', 400)
 
-    place = []
+    places = []
     if "states" in request_data.keys():
         states = [storage.get(State, state_id)
                   for state_id in request_data.get('states')]
