@@ -12,16 +12,16 @@ from models.state import State
 @app_views.route('/states', methods=['GET', 'POST'], strict_slashes=False)
 def states():
     """Create a new view for State objects that handles all default
-    RestFul API actions.
+    RESTful API actions.
     """
     if request.method == 'GET':
-        return jsonify([val.to_dict() for val in storage.all('State')
-                        .values()])
+        # Retrieves the list of all State objects
+        return jsonify([val.to_dict() for val in storage.all(State).values()])
     elif request.method == 'POST':
         post = request.get_json()
-        if post is None or type(post) != dict:
+        if not post or not isinstance(post, dict):
             return jsonify({'error': 'Not a JSON'}), 400
-        elif post.get('name') is None:
+        elif 'name' not in post:
             return jsonify({'error': 'Missing name'}), 400
         new_state = State(**post)
         new_state.save()
@@ -31,23 +31,25 @@ def states():
 @app_views.route('/states/<string:state_id>',
                  methods=['GET', 'PUT', 'DELETE'], strict_slashes=False)
 def get_state_id(state_id):
-    """Retrieves a state object with a specific id"""
-    state = storage.get('State', state_id)
+    """Retrieves, updates or deletes a State object with a specific id"""
+    state = storage.get(State, state_id)
     if state is None:
         abort(404)
     elif request.method == 'GET':
+        # Retrieves a State object with a specific id
         return jsonify(state.to_dict())
     elif request.method == 'DELETE':
-        state = storage.get('State', state_id)
+        # Deletes a State object with a specific id
         storage.delete(state)
         storage.save()
         return jsonify({}), 200
     elif request.method == 'PUT':
+        # Updates a State object with a specific id
         put = request.get_json()
-        if put is None or type(put) != dict:
+        if not put or not isinstance(put, dict):
             return jsonify({'error': 'Not a JSON'}), 400
         for key, value in put.items():
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(state, key, value)
-                storage.save()
+        storage.save()
         return jsonify(state.to_dict()), 200
